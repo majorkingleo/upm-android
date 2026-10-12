@@ -1,0 +1,56 @@
+{
+	// The build runs through the committed wrapper. JAVA_HOME is set explicitly
+	// because this machine also carries JDK 25, which the Android Gradle Plugin
+	// does not support, and a task should not depend on which JDK the shell
+	// happens to default to.
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Android: build debug APK",
+			"detail": "build/outputs/apk/debug/",
+			"type": "shell",
+			"command": "./gradlew",
+			"args": [
+				"assembleDebug"
+			],
+			"options": {
+				"env": {
+					"JAVA_HOME": "/usr/lib/jvm/java-21-openjdk"
+				}
+			},
+			"problemMatcher": [],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"label": "Android: run on emulator",
+			"detail": "create the AVD if missing, boot it, installDebug, launch the app",
+			"type": "shell",
+			"command": "./scripts/emulator-run.sh",
+			"problemMatcher": [],
+			"group": "test"
+		},
+		{
+			"label": "Android: stop emulator",
+			"detail": "shut the running emulator down (adb emu kill)",
+			"type": "shell",
+			"command": "./scripts/emulator-run.sh",
+			"args": [
+				"--stop"
+			],
+			"problemMatcher": []
+		},
+		{
+			"label": "Android: install on device",
+			"detail": "installDebug on the attached phone (never an emulator) and start the app",
+			"type": "shell",
+			"command": "./scripts/install-on-device.sh",
+			"args": [
+				"--launch"
+			],
+			"problemMatcher": []
+		}
+	]
+}
