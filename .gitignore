@@ -11,3 +11,6 @@ local.properties
 .gradle
 build/
 release/
+
+# local bug reports (screenshots etc.)
+bug-reports/
