@@ -55,6 +55,18 @@ Run `python3 scripts/<script>.py --help` for the full flag list.
    python3 scripts/webdav-test.py status    # remote vs local db
    ```
    `push`/`reset` seed it from `scripts/upm.db` (or `scripts/test.db`).
+
+   To exercise the **first-ever upload** (empty Nextcloud + fresh local db):
+   ```
+   python3 scripts/webdav-test.py delete       # remote db must be absent (404)
+   python3 scripts/webdav-test.py status
+   ```
+   then install a fresh local db (step 4) and sync. Expected: GET 404 -> the app
+   falls through to upload -> DELETE 404 ("nothing to delete", treated as success)
+   + PUT 201, and afterwards the remote md5 must equal the app's `files/upm.db` md5.
+   Note the auth account of `scripts/test.db` does not hold the remote password, so
+   fix it in the app *before* setting the Shared URL - account edits are allowed
+   while no Shared URL is configured (`Utilities.isSyncRequired`).
 4. **Put a known database in place** (only if the app's vault is unknown):
    ```
    adb -s emulator-5554 shell am force-stop com.u17od.upm

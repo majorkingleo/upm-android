@@ -72,6 +72,9 @@ def cmd_dump(args, serial, verbose):
             print(f"{cls:14} | {text} | {n.get('bounds')} | click={n.get('clickable')} enabled={n.get('enabled')}")
         elif text:
             print(f"{text}  {n.get('bounds')}")
+        elif cls:
+            # empty EditText/Button are easy to miss otherwise
+            print(f"<empty {cls}>  {n.get('bounds')}")
     return 0
 
 

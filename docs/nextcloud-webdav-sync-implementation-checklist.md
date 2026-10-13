@@ -600,6 +600,7 @@ with `scripts/webdav-test.py` + `scripts/upm-ui.py`:
 | Upload when remote file exists → DELETE→204 + PUT | ✅ remote db replaced |
 | Uploaded bytes | ✅ remote md5 == app `files/upm.db` md5 (`45ebc20e…`, 140 bytes) |
 | No-op sync (same revision) | ✅ remote unchanged, 0 TransportExceptions |
+| **First-ever upload** (remote db deleted → 404, fresh local db) | ✅ re-verified 2026-10-13: app uploaded on its own, remote md5 == app md5 (`7883ad45…`, 140 bytes), DELETE→404 tolerated |
 
 Gotchas found while verifying (documented in `README_DEV.txt`):
 
