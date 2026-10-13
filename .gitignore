@@ -14,3 +14,9 @@ release/
 
 # local bug reports (screenshots etc.)
 bug-reports/
+
+# python bytecode from the scripts/ helpers
+__pycache__/
+
+# local secrets: the remote (WebDAV) password used by scripts/webdav-test.py
+password.txt

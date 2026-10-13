@@ -29,7 +29,7 @@ steps in order; verify with the build command at the end.
 
 ---
 
-## Step 1 — Add the `webdav` constant in `Prefs.java`
+## Step 1 — Add the `webdav` constant in `Prefs.java` — ✅ DONE (2026-10-13)
 
 Find:
 
@@ -52,7 +52,7 @@ Replace with:
     }
 ```
 
-## Step 2 — Add `WEBDAV` to `syncMethodValues` in `Prefs.java`
+## Step 2 — Add `WEBDAV` to `syncMethodValues` in `Prefs.java` — ✅ DONE (2026-10-13)
 
 Find:
 
@@ -70,7 +70,7 @@ Replace with:
     };
 ```
 
-## Step 3 — Enable the settings category for WebDAV in `Prefs.java`
+## Step 3 — Enable the settings category for WebDAV in `Prefs.java` — ✅ DONE (2026-10-13)
 
 Find:
 
@@ -96,7 +96,7 @@ Replace with:
         }
 ```
 
-## Step 4 — Mark the change as save-required when switching to/from WebDAV in `Prefs.java`
+## Step 4 — Mark the change as save-required when switching to/from WebDAV in `Prefs.java` — ✅ DONE (2026-10-13)
 
 Without this, switching `disabled → webdav` is never persisted.
 
@@ -119,7 +119,7 @@ Replace with:
                 }
 ```
 
-## Step 5 — Persist `remoteLocation` / `authDBEntry` for WebDAV in `Prefs.java`
+## Step 5 — Persist `remoteLocation` / `authDBEntry` for WebDAV in `Prefs.java` — ✅ DONE (2026-10-13)
 
 Find:
 
@@ -148,7 +148,7 @@ Replace with:
                 }
 ```
 
-## Step 6 — Fix the empty-string sync-method bug in `Utilities.java`
+## Step 6 — Fix the empty-string sync-method bug in `Utilities.java` — ✅ DONE (2026-10-13)
 
 Find:
 
@@ -174,7 +174,7 @@ Replace with:
         }
 ```
 
-## Step 7 — Normalise `""` to `null` in `Utilities.getSyncMethod(Activity)`
+## Step 7 — Normalise `""` to `null` in `Utilities.getSyncMethod(Activity)` — ✅ DONE (2026-10-13)
 
 Find:
 
@@ -201,7 +201,7 @@ Replace with:
     }
 ```
 
-## Step 8 — Add `import java.io.OutputStream;` to `HTTPTransport.java`
+## Step 8 — Add `import java.io.OutputStream;` to `HTTPTransport.java` — ✅ DONE (2026-10-13)
 
 Find:
 
@@ -220,7 +220,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 ```
 
-## Step 9 — Add the two WebDAV methods and open up `addTrailingSlash` in `HTTPTransport.java`
+## Step 9 — Add the two WebDAV methods and make `addTrailingSlash` public in `HTTPTransport.java` — ✅ DONE (2026-10-13)
 
 Find:
 
@@ -297,10 +297,15 @@ Replace with:
     }
 
 
-    String addTrailingSlash(String url) {
+    public String addTrailingSlash(String url) {
 ```
 
-## Step 10 — Create `SyncDatabaseViaWebdavActivity.java`
+> Note: originally specified as package-private `String addTrailingSlash(String url)`,
+> but `HTTPTransport` lives in `com.u17od.upm.transport` while
+> `SyncDatabaseViaWebdavActivity` lives in `com.u17od.upm`, so package-private
+> access does not cross the package boundary. Made `public` so Step 10 compiles.
+
+## Step 10 — Create `SyncDatabaseViaWebdavActivity.java` — ✅ DONE (2026-10-13)
 
 Create the file `src/com/u17od/upm/SyncDatabaseViaWebdavActivity.java` with the
 full content below. It inherits download (plain GET) from
@@ -409,7 +414,7 @@ public class SyncDatabaseViaWebdavActivity extends SyncDatabaseViaHttpActivity {
 }
 ```
 
-## Step 11 — Register the activity in `AndroidManifest.xml`
+## Step 11 — Register the activity in `AndroidManifest.xml` — ✅ DONE (2026-10-13)
 
 Find:
 
@@ -431,7 +436,7 @@ Replace with:
         </activity>
 ```
 
-## Step 12 — Route the Sync menu to the WebDAV activity in `FullAccountList.java`
+## Step 12 — Route the Sync menu to the WebDAV activity in `FullAccountList.java` — ✅ DONE (2026-10-13)
 
 Find:
 
@@ -454,7 +459,7 @@ Replace with:
             }
 ```
 
-## Step 13 — Add the string in `res/values/strings.xml`
+## Step 13 — Add the string in `res/values/strings.xml` — ✅ DONE (2026-10-13)
 
 Find:
 
@@ -475,7 +480,7 @@ Replace with:
     <string name="sync_method_webdav">WebDAV (Nextcloud)</string>
 ```
 
-## Step 14 — Add the string in `res/values-de/strings.xml`
+## Step 14 — Add the string in `res/values-de/strings.xml` — ✅ DONE (2026-10-13)
 
 Find:
 
@@ -496,7 +501,7 @@ Replace with:
     <string name="sync_method_webdav">WebDAV (Nextcloud)</string>
 ```
 
-## Step 15 — Add the string in `res/values-fr/strings.xml`
+## Step 15 — Add the string in `res/values-fr/strings.xml` — ✅ DONE (2026-10-13)
 
 Find:
 
@@ -517,7 +522,7 @@ Replace with:
     <string name="sync_method_webdav">WebDAV (Nextcloud)</string>
 ```
 
-## Step 16 — Add the string in `res/values-ru/strings.xml`
+## Step 16 — Add the string in `res/values-ru/strings.xml` — ✅ DONE (2026-10-13)
 
 Find:
 
@@ -538,7 +543,7 @@ Replace with:
     <string name="sync_method_webdav">WebDAV (Nextcloud)</string>
 ```
 
-## Step 17 — Add the entry to `res/values/arrays.xml`
+## Step 17 — Add the entry to `res/values/arrays.xml` — ✅ DONE (2026-10-13)
 
 The array order must match `syncMethodValues` in `Prefs.java`.
 
@@ -563,13 +568,49 @@ Replace with:
     </string-array>
 ```
 
-## Step 18 — (Optional) Document WebDAV + app passwords in `README`
+## Step 18 — (Optional) Document WebDAV + app passwords in `README` — ✅ DONE (2026-10-13)
+
+Added a "Database Sync" section (WebDAV/Nextcloud notes incl. the app-password
+requirement for 2FA) plus a "Vibecoded" attribution section.
 
 Add a short section stating that, for Nextcloud with 2FA enabled, the "Shared
 URL auth" account must store an **app password** (Settings → Security → Devices
 & sessions), and that the account password is rejected for WebDAV when 2FA is on.
 
-## Step 19 — Build and verify
+## Step 19 — Build and verify — ✅ DONE (2026-10-13)
+
+### Build
+`env JAVA_HOME=/usr/lib/jvm/java-21-openjdk ./gradlew assembleDebug` →
+**BUILD SUCCESSFUL** (only pre-existing deprecation notes; no new errors).
+`SyncDatabaseViaWebdavActivity.class` + `SyncDatabaseViaWebdavActivity$UploadDatabaseWebdav.class`
+were emitted. `sync_methods_human` has 4 items matching the 4 `syncMethodValues`.
+
+### Runtime verification on the emulator (real Nextcloud)
+Verified against `https://nextcloud.borger.co.at/remote.php/dav/files/test/upm/`
+with `scripts/webdav-test.py` + `scripts/upm-ui.py`:
+
+| Check | Result |
+|---|---|
+| Sync Method picker lists `WebDAV (Nextcloud)` | ✅ 4 entries |
+| Selecting WebDAV keeps HTTP Server Settings editable | ✅ URL dialog opens |
+| Switching to WebDAV persists (URL + auth account survive leaving Preferences) | ✅ |
+| Sync menu routes to `SyncDatabaseViaWebdavActivity` | ✅ (logcat: START …SyncDatabaseViaWebdavActivity from uid of com.u17od.upm) |
+| Download (GET, Basic auth from the auth account) | ✅ rev comparison reached upload |
+| Upload when remote file is absent → DELETE→404 + PUT | ✅ remote db written |
+| Upload when remote file exists → DELETE→204 + PUT | ✅ remote db replaced |
+| Uploaded bytes | ✅ remote md5 == app `files/upm.db` md5 (`45ebc20e…`, 140 bytes) |
+| No-op sync (same revision) | ✅ remote unchanged, 0 TransportExceptions |
+
+Gotchas found while verifying (documented in `README_DEV.txt`):
+
+* The auth account must hold the **remote** password. An account password that
+  is not the Nextcloud password yields `Received the response code 401`.
+* With a Shared URL configured, account edits are refused until a sync ran
+  within 5 minutes (`Utilities.isSyncRequired`) — set Sync Method = Disabled to
+  break the deadlock and fix credentials.
+* The local WebDAV test server over plain http is unusable from the app:
+  Android blocks cleartext (`java.io.IOException: Cleartext HTTP traffic to
+  10.0.2.2 not permitted`), so the https Nextcloud instance was used instead.
 
 Run:
 
@@ -581,5 +622,5 @@ It must succeed with no new errors. `get_errors` on the touched files should be
 empty. Quick self-checks:
 
 - `Prefs.SyncMethod.WEBDAV` resolves.
-- `HTTPTransport.putWebdav` / `deleteWebdav` / package-visible `addTrailingSlash` resolve from `SyncDatabaseViaWebdavActivity`.
+- `HTTPTransport.putWebdav` / `deleteWebdav` / `public addTrailingSlash` resolve from `SyncDatabaseViaWebdavActivity`.
 - `R.string.sync_method_webdav` resolves and `sync_methods_human` still has the same length as `syncMethodValues`.
