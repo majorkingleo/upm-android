@@ -96,6 +96,7 @@ Run `python3 scripts/<script>.py --help` for the full flag list.
 
 | Symptom | Cause / fix |
 |---|---|
+| `Problem Uploading Database` with `response code 404 ... /upm.db/upm.db` | The Shared URL points at the **file** instead of the folder. The app appends the db file name itself, so it becomes `.../upm.db/upm.db`. Set the Shared URL to the folder (`.../remote.php/dav/files/USER/UPM/`). |
 | `Received the response code 401` | The "HTTP Authentication Account" password is not the **remote** password. Nextcloud with 2FA needs an app password (Settings → Security → Devices & sessions). Probe it with `webdav-test.py check --password-file FILE`. |
 | Taps do nothing, `screencap` is black | Screen asleep → `adb shell svc power stayon true`. With `EMULATOR_GPU=swiftshader_indirect` the framebuffer may stay black while the app works: trust `upm-ui.py dump`/`focus`, not screenshots. |
 | Menu item tap has no effect | The overflow popup reports window-relative bounds; tap by text (`upm-ui.py tap`) rather than hand-computed coordinates. |
