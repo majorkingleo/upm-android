@@ -6,10 +6,10 @@ discarding one side.
 
 Status: Phase 1 implemented (revision setter, `DatabaseMerger` + unit tests,
 base-file helpers, `syncDb` merge/fallback flow, base bookkeeping, strings).
-Build + unit tests pass. Emulator verification started — see §8 for the
-handover (what was tested, what was not, and how to continue).
+Build + unit tests pass. Emulator matrix rows 1-9 verified end-to-end (row 10
+half-verified) with `scripts/merge-test.sh` — see §8 for details.
 
-Legend: ✅ done · ⬜ pending
+Legend: ✅ done · ⬜ pending · 🟡 partial
 
 ---
 
@@ -116,7 +116,7 @@ The "same?" column compares the whole `AccountInformation` (all five fields).
 Phase 2 (optional, later): a resolution dialog per conflict instead of the
 automatic duplicate.
 
-### `DatabaseOptions`
+### `DatabaseOptions`### Option A — Nextcloud app, 
 
 `remoteLocation`/`authDBEntry` describe *how this device reaches the server*;
 they are not user data. Always keep the **local** values (the device that is
@@ -139,7 +139,7 @@ All paths relative to repo root. Package root `src/com/u17od/upm/`.
 | Expose `setRevision` on the db | `src/com/u17od/upm/database/PasswordDatabase.java` | ✅ done |
 | In-memory db constructor (merge result) | `src/com/u17od/upm/database/PasswordDatabase.java` | ✅ done (extra) |
 | Account equality for merge | `src/com/u17od/upm/database/AccountInformation.java` | ✅ done (extra) |
-| Unit tests for the merge algorithm | `tests/java/com/u17od/upm/database/DatabaseMergerTest.java` | ✅ done |
+| Unit tests for the merge algorithm | `tests/java/com/u17od/upm/database/DatabaseM### Option A — Nextcloud app, ergerTest.java` | ✅ done |
 | Test dependencies (JUnit, BouncyCastle) | `build.gradle` | ✅ done |
 | Decide upload/download/merge | `src/com/u17od/upm/SyncDatabaseActivity.java` | ✅ done |
 | Base-file path + copy helper | `src/com/u17od/upm/Utilities.java` | ✅ done |
@@ -257,8 +257,8 @@ Add (values, values-de, values-fr, values-ru):
 4. ✅ `syncDb` rewrite with base loading, merge, and fallback backup.
 5. ✅ Base-file bookkeeping after sync + delete on password change.
 6. ✅ Strings.
-7. 🟡 Build passes and the empty-remote upload path is verified on the emulator;
-   the rest of the matrix (rows 1-10) is ⬜ — resume via §8.
+7. ✅ Build passes; emulator matrix rows 1-9 verified (row 10 partial) via
+   `scripts/merge-test.sh` — see §8.
 
 **Phase 2 — interactive conflict resolution (optional)** — ⬜ not started
 - Replace the automatic `" (remote)"` duplicate with a dialog listing conflicts
@@ -270,10 +270,9 @@ Add (values, values-de, values-fr, values-ru):
 Seed states with `scripts/webdav-test.py push/pull/delete` and drive the app with
 `scripts/upm-ui.py`. Check the resulting account list + remote md5.
 
-Status: ⬜ partial — only the empty-remote (→ upload) path has been verified on
-the emulator so far; rows 1-10 below are still to be run (see §8). Rows 1-7 and
-9 are already covered at the algorithm level by `DatabaseMergerTest`; the
-emulator rows additionally exercise the base-file and `syncDb` wiring.
+Status: ✅ rows 1-9 verified on the emulator, plus row 10 "base dropped"; only
+the second half of row 10 (LWW cycle + base rebuild) is not automated. Rows are
+scripted in `scripts/merge-test.sh` (`all` runs them). See §8.
 
 | # | Base | Local | Remote | Expected |
 |---|---|---|---|---|
@@ -302,10 +301,11 @@ emulator rows additionally exercise the base-file and `syncDb` wiring.
 - Never decrypt or write the base file during a partial sync: only update it
   after a fully successful, converged sync.
 
-## 8. Emulator verification — handover (2026-10-13)
+## 8. Emulator verification — results (2026-10-13/14)
 
-Resume point for the emulator test run. Phase 1 is implemented and builds; the
-algorithm is unit-tested; the emulator wiring has been started but not finished.
+Outcome of the emulator test run. Phase 1 is implemented and builds; the
+algorithm is unit-tested; the emulator matrix rows 1-9 pass and row 10 is
+half-verified. Reproduce with `scripts/merge-test.sh all`.
 
 ### 8.1 Verified on the emulator ✅
 
@@ -320,24 +320,28 @@ algorithm is unit-tested; the emulator wiring has been started but not finished.
   This confirms: empty remote → upload, the upload-success base hook, and
   `base == local == remote` after a converged sync.
 
-### 8.2 Not verified yet ⬜
+### 8.2 Emulator matrix — ✅ verified
 
-None of the divergent rows (1-8) nor the password-change row (10) have been run.
-They are covered by `DatabaseMergerTest` at the algorithm level but still need
-the emulator run to check the base-file + `syncDb` wiring.
+All rows below pass on the emulator; the assertions live in
+`scripts/merge-test.sh` (run `scripts/merge-test.sh all`). Full-suite result:
+**20 assertions passed, 0 failed** (rows 1, 2, 4, 8, 9, 3, 5, 6, 7, 10).
 
-| Row | Scenario | Status |
+| Row | Scenario | Result |
 |---|---|---|
-| 1 | remote changed only → download | ⬜ not run |
-| 2 | local changed only → upload | ⬜ not run |
-| 3 | both changed → union merge (upload) | ⬜ not run |
-| 4 | local edit → upload | ⬜ not run |
-| 5 | conflict → `acc` + `acc (remote)` | ⬜ not run |
-| 6 | deletion → upload | ⬜ not run |
-| 7 | delete-vs-edit → keep edited | ⬜ not run |
-| 8 | no base → LWW + conflict backup file | ⬜ not run |
-| 9 | up to date → no transfer | ⬜ not run |
-| 10 | password change → base dropped then rebuilt | ⬜ not run |
+| 1 | remote changed only → download | ✅ local == remote, account present |
+| 2 | local changed only → upload | ✅ converged, local change preserved |
+| 3 | both added different → union merge | ✅ both accounts present, converged |
+| 4 | local edit → upload | ✅ converged |
+| 5 | both edited same account → conflict | ✅ `test` + `test (remote)` |
+| 6 | deletion → upload | ✅ converged, account gone |
+| 7 | delete-vs-edit → keep edit | ✅ edited account kept |
+| 8 | no base → LWW + conflict backup | ✅ `upm.db.conflict-*` written, converged |
+| 9 | up to date → no transfer | ✅ remote untouched |
+| 10 | password change → base dropped | 🟡 base deleted ✅; follow-on LWW cycle + rebuild ⬜ |
+
+The only un-automated piece is the second half of row 10: after a password
+change the next sync prompts for the remote's *old* password (the remote is
+still encrypted with it), and that prompt is not driven by the script yet.
 
 ### 8.3 Environment / setup to recreate
 
@@ -382,35 +386,55 @@ the emulator run to check the base-file + `syncDb` wiring.
   redirection fail with syntax errors in this terminal. Put these sequences in a
   **bash script** under `scripts/` and run that, rather than pasting multi-line
   shell into fish.
-- **Overflow-menu taps are unreliable**: the `PopupWindow` (Sync / Add / …)
-  reports window-relative bounds, so `upm-ui.py tap "<item>"` landed on the wrong
-  spot after the emulator reboot (it had worked once right after a fresh
-  install). This blocked creating the second db variant. Fixing this is the
-  first next step — e.g. a bash helper that opens the menu and taps
-  screenshot-derived absolute coordinates, or a test-only debug hook/intent to
-  trigger a sync without the menu.
+- **Overflow-menu taps (RESOLVED)**: the real cause was not bad coordinates but
+  the 5-minute `isSyncRequired` edit guard — tapping *Add* while it is active
+  silently shows a "sync required" toast instead of opening the form. With a
+  recent sync the taps land correctly, and the menu opens reliably with the MENU
+  key (`adb shell input keyevent 82`), which `scripts/merge-test.sh` now uses.
 
-### 8.5 Next steps (in order)
+### 8.5 Next steps
 
-1. Write `scripts/merge-test.sh` (bash) wrapping: boot, seed db/base, unlock,
-   trigger sync, assert md5s. Removes both blockers above (no fish, no fragile
-   menu taps).
-2. Create the "remote" variant `R2.db` (base + account `remoteacc`) and capture
-   it to `/tmp/R2.db`.
-3. Run the matrix (set `files/upm.db` / `files/upm.db.sync-base` from the `/tmp`
-   artifacts, push the remote with `webdav-test.py`):
-   - Row 2: local=`L1`, base=`B0`, remote=`B0` → expect upload; remote md5 = `L1`.
-   - Row 1: local=`B0`, base=`B0`, remote=`L1` → expect download; local md5 = `L1`.
-   - Row 3: local=`L1`, base=`B0`, remote=`R2` → expect upload with
-     `test` + `localacc` + `remoteacc`.
-   - Row 5: edit account `test` differently on each side → expect `test` +
-     `test (remote)`.
-   - Rows 6/7: delete/edit combinations.
-   - Row 8: delete `files/upm.db.sync-base`; local/remote differ → expect LWW +
-     `files/upm.db.conflict-*`.
-   - Row 9: local == base == remote → "up to date", remote untouched.
-   - Row 10: change the master password → base deleted; next sync LWW then base
-     rebuilt.
-4. Decide whether to keep `build-types/debug/AndroidManifest.xml` (fine to keep
-   for a debug-only cleartext test path) and whether to commit
-   `scripts/merge-test.sh`.
+1. ✅ `scripts/merge-test.sh` written (§8.6) — removes both blockers: everything
+   runs from bash, and the menu is opened with the MENU key.
+2. ✅ Variant artifacts created (§8.6).
+3. ✅ Rows 1-9 pass; row 10 "base dropped" passes.
+4. ⬜ Optional: script the second half of row 10 (the LWW cycle + base rebuild
+   after a password change) — needs the remote's old password typed at the
+   `EnterMasterPassword` prompt.
+5. ⬜ Decide whether to commit `scripts/merge-test.sh` and keep
+   `build-types/debug/AndroidManifest.xml` (debug-only cleartext).
+
+### 8.6 `scripts/merge-test.sh`
+
+Bash harness that drives the app and asserts the database bytes for each row.
+It seeds `files/upm.db` / `files/upm.db.sync-base` from artifacts, unlocks the
+app, triggers Sync (MENU key, reliable), and compares md5s via
+`webdav-test.py`/`run-as`. It also builds UI variants (there is no CLI writer for
+the encrypted format).
+
+```
+scripts/merge-test.sh up                       # WebDAV server + emulator
+scripts/merge-test.sh addaccount OUT NAME [BASE]
+scripts/merge-test.sh edit      OUT BASE ACCOUNT FIELD_INDEX VALUE   # 2=password 1=user
+scripts/merge-test.sh deleteaccount OUT BASE ACCOUNT
+scripts/merge-test.sh row 1..10                # run one row
+scripts/merge-test.sh all                      # run every row whose artifacts exist
+```
+
+Artifacts (default `ART_DIR=/tmp`, recreate with the `addaccount`/`edit`/
+`deleteaccount` commands from `B0.db`):
+
+| File | Meaning |
+|---|---|
+| `B0.db` | base = `{test}` (includes the WebDAV settings) |
+| `L1.db` | `B0` + account `localacc` (local-only change) |
+| `R2.db` | `B0` + account `remoteacc` (remote-only change) |
+| `Lc.db` | `B0` with `test` password edited (local conflict side) |
+| `Rc.db` | `B0` with `test` user-id edited (remote conflict side) |
+| `DEL.db` | `B0` with `test` deleted |
+
+Note: `B0.db` was captured after earlier manual edits, so its `test` account is
+not the pristine upstream value — only the *differences* between artifacts
+matter. Each artifact carries a sibling `*.password` file (the master password,
+mask `newmaster1`), passed to `webdav-test.py` and used by `cmd_unlock` via
+`DB_PASSWORD_FILE`.
